@@ -22,30 +22,31 @@
     ** Blog **
     =================================================== -->
   <div class="container blog-wrapper padding-lg">
-
+    
+    <!-- Estado vacío -->
     <div v-if="publicacionesList.length === 0" class="text-center py-5">
       <h2>SIN PUBLICACIONES</h2>
       <p class="text-muted">Próximamente se agregarán nuevas publicaciones.</p>
     </div>
 
-    <div v-else>
-      <div
-        v-for="(pub, index) of publicacionesPaginadas"
-        :key="pub.publicaciones_id || index"
-        class="row mb-4"
-      >
-
-        <div class="col-sm-8 blog-left">
+    <div v-else class="row">
+      
+      <!-- Columna Izquierda: Lista de Publicaciones -->
+      <div class="col-sm-8 blog-left">
+        <div
+          v-for="(pub, index) of publicacionesPaginadas"
+          :key="pub.publicaciones_id || index"
+          class="mb-4"
+        >
           <div class="blog-listing">
-
             <img
-              style="width: 750px; height: 270px; object-fit: cover; border-radius: 8px;"
+              style="width: 100%; height: 270px; object-fit: cover; border-radius: 8px;"
               :src="imageUrl + pub.publicaciones_imagen"
               class="img-responsive"
               :alt="pub.publicaciones_titulo || 'Imagen de publicación'"
             />
 
-            <div class="left-aligned">
+            <div class="left-aligned mt-3">
               <ul class="post-detail">
                 <li>
                   <span class="icon-date-icon ico"></span>
@@ -83,36 +84,39 @@
           </div>
         </div>
 
-        <div class="col-sm-4">
-          <SidebarCustom />
+        <!-- Paginación -->
+        <div class="text-center mt-4" v-if="pager > 1">
+          <ul class="pagination blue justify-content-center">
+            <li class="pagination-arrow" :class="{ disable: pag <= 1 }">
+              <a href="#" aria-label="Previous" @click.prevent="prevPage">
+                <span aria-hidden="true">
+                  <i class="fa fa-angle-left" aria-hidden="true"></i>
+                </span>
+              </a>
+            </li>
+
+            <li v-for="i in pager" :key="i" :class="{ active: i === pag }">
+              <a href="#" @click.prevent="goToPage(i)">
+                {{ i }}
+              </a>
+            </li>
+
+            <li class="pagination-arrow" :class="{ disable: pag >= pager }">
+              <a href="#" aria-label="Next" @click.prevent="nextPage">
+                <span aria-hidden="true">
+                  <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </span>
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
 
-      <div class="text-center mt-4" v-if="pager > 1">
-        <ul class="pagination blue justify-content-center">
-          <li class="pagination-arrow" :class="{ disable: pag <= 1 }">
-            <a href="#" aria-label="Previous" @click.prevent="prevPage">
-              <span aria-hidden="true">
-                <i class="fa fa-angle-left" aria-hidden="true"></i>
-              </span>
-            </a>
-          </li>
-
-          <li v-for="i in pager" :key="i" :class="{ active: i === pag }">
-            <a href="#" @click.prevent="goToPage(i)">
-              {{ i }}
-            </a>
-          </li>
-
-          <li class="pagination-arrow" :class="{ disable: pag >= pager }">
-            <a href="#" aria-label="Next" @click.prevent="nextPage">
-              <span aria-hidden="true">
-                <i class="fa fa-angle-right" aria-hidden="true"></i>
-              </span>
-            </a>
-          </li>
-        </ul>
+      <!-- Columna Derecha: Sidebar (UNA SOLA VEZ) -->
+      <div class="col-sm-4">
+        <SidebarCustom />
       </div>
+      
     </div>
   </div>
 </template>
@@ -134,13 +138,9 @@
   padding: 3rem 0;
 }
 
-.mt-4 {
-  margin-top: 1.5rem;
-}
-
-.mb-4 {
-  margin-bottom: 1.5rem;
-}
+.mt-3 { margin-top: 1rem; }
+.mt-4 { margin-top: 1.5rem; }
+.mb-4 { margin-bottom: 1.5rem; }
 
 .pagination.blue {
   display: flex;
@@ -241,7 +241,6 @@ export default {
   
   data() {
     return {
-      // Paginación
       NUM_RESULTS: 4,
       pag: 1,
     };
@@ -253,19 +252,20 @@ export default {
   
   computed: {
     ...mapState(["publicaciones", "url_api"]),
-
+    
+    // ✅ CORREGIDO: URL sin espacios + dominio correcto
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo').trim();
+      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo/uploads').trim();
     },
-
+    
     publicacionesList() {
       return this.publicaciones?.filter(p => p.publicaciones_id) || [];
     },
-
+    
     pager() {
       return Math.ceil(this.publicacionesList.length / this.NUM_RESULTS);
     },
-
+    
     publicacionesPaginadas() {
       const start = (this.pag - 1) * this.NUM_RESULTS;
       const end = start + this.NUM_RESULTS;
@@ -281,7 +281,7 @@ export default {
       if (isNaN(fecha.getTime())) return fechaISO;
       return `${fecha.getDate()} de ${meses[fecha.getMonth()]} de ${fecha.getFullYear()}`;
     },
-
+    
     goToPage(page) {
       if (page >= 1 && page <= this.pager) {
         this.pag = page;

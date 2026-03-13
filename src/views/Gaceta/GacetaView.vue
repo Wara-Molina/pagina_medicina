@@ -333,8 +333,10 @@ export default {
   
   methods: {
     documentoUrl(nombreArchivo) {
-      if (!nombreArchivo) return '';
-      return `${this.imageUrl}/Gaceta/${nombreArchivo}`;
+if (!nombreArchivo) return '#'
+      if (nombreArchivo.startsWith('http')) return nombreArchivo
+      const base = this.imageUrl.endsWith('/') ? this.imageUrl : `${this.imageUrl}/`
+      return `${base}${nombreArchivo.trim()}`
     },
     
     formatearFecha(fechaISO) {

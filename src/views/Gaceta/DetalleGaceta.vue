@@ -21,7 +21,6 @@
   <div class="container blog-wrapper padding-lg">
     <div class="row">
 
-      <!-- Estado: Gaceta no encontrada -->
       <div class="col-sm-8 blog-left" v-if="gacetaNotFound">
         <div class="single-blog-inner mb-0 text-center py-5">
           <i class="fa fa-file-pdf-o text-muted" style="font-size: 4rem; opacity: 0.3;"></i>
@@ -38,7 +37,6 @@
       <div class="col-sm-8 blog-left" v-else-if="gacetaData">
         <ul class="blog-listing detail">
           <li>
-
             <div class="pdf-container">
               <a 
                 :href="documentoUrl(gacetaData.gaceta_documento)" 
@@ -48,7 +46,9 @@
                 class="pdf-link"
               >
                 <div class="pdf-wrapper">
+
                   <VuePdfEmbed 
+                    v-if="pdfUrlValid"
                     :source="documentoUrl(gacetaData.gaceta_documento)" 
                     :disableTextLayer="true"
                     :page="1"
@@ -57,6 +57,19 @@
                     @loaded="onPdfLoaded"
                     @error="onPdfError"
                   />
+
+                  <div v-else class="pdf-fallback">
+                    <i class="fa fa-file-pdf-o" style="font-size: 3rem;"></i>
+                    <p class="mt-2">Vista previa no disponible</p>
+                    <a 
+                      :href="documentoUrl(gacetaData.gaceta_documento)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="btn btn-sm btn-outline"
+                    >
+                      <i class="fa fa-download"></i> Descargar PDF
+                    </a>
+                  </div>
                 </div>
                 <span class="pdf-overlay">
                   <i class="fa fa-external-link"></i> Abrir en nueva pestaña
@@ -103,7 +116,6 @@
 </template>
 
 <style scoped>
-/* Contenedor de PDF */
 .pdf-container {
   position: relative;
   max-height: 600px;
@@ -113,27 +125,33 @@
   margin-bottom: 1.5rem;
   background: #f8f9fa;
 }
-
 .pdf-wrapper {
   width: 100%;
   height: 100%;
   min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
 .pdf-embed {
   width: 100%;
   height: 100%;
   display: block;
 }
-
-/* Overlay informativo al hacer hover */
+.pdf-fallback {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+.pdf-fallback .btn {
+  margin-top: 1rem;
+}
 .pdf-link {
   position: relative;
   display: block;
   text-decoration: none;
   color: inherit;
 }
-
 .pdf-overlay {
   position: absolute;
   bottom: 0;
@@ -145,40 +163,23 @@
   font-size: 0.85rem;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
   opacity: 0;
   transition: opacity 0.2s;
 }
-
-.pdf-link:hover .pdf-overlay {
-  opacity: 1;
-}
-
-.pdf-overlay .fa-external-link {
-  font-size: 0.9rem;
-}
+.pdf-link:hover .pdf-overlay { opacity: 1; }
+.pdf-overlay .fa-external-link { font-size: 0.9rem; }
 
 /* Estilos generales */
-.bg-overlay-img {
-  background-image: url("@/assets/Fondo2.jpg");
-}
-
-.text-muted {
-  color: #6c757d;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.py-5 {
-  padding: 3rem 0;
-}
-
+.bg-overlay-img { background-image: url("@/assets/Fondo2.jpg"); }
+.text-muted { color: #6c757d; }
+.text-center { text-align: center; }
+.py-5 { padding: 3rem 0; }
+.mt-2 { margin-top: 0.5rem; }
 .mt-3 { margin-top: 1rem; }
 .mt-4 { margin-top: 1.5rem; }
 .mb-0 { margin-bottom: 0; }
-
 .btn {
   display: inline-block;
   padding: 8px 20px;
@@ -189,19 +190,16 @@
   text-decoration: none;
   border: none;
 }
-
 .btn-outline {
   background: transparent;
   border: 1px solid var(--main-color, #c00014);
   color: var(--main-color, #c00014);
 }
-
 .btn-outline:hover {
   background: var(--main-color, #c00014);
   color: #fff;
 }
-
-/* Post detail */
+.btn-sm { padding: 4px 12px; font-size: 0.85rem; }
 .post-detail {
   list-style: none;
   padding: 0;
@@ -211,14 +209,12 @@
   flex-wrap: wrap;
   align-items: center;
 }
-
 .post-detail li {
   font-size: 0.9rem;
   display: flex;
   align-items: center;
   gap: 0.3rem;
 }
-
 .post-detail .label {
   background: var(--main-color, #c00014);
   color: #fff;
@@ -226,12 +222,7 @@
   border-radius: 4px;
   font-size: 0.85rem;
 }
-
-.post-detail .bold {
-  font-weight: 600;
-}
-
-/* Spinner de carga */
+.post-detail .bold { font-weight: 600; }
 .spinner-border {
   width: 3rem;
   height: 3rem;
@@ -247,13 +238,8 @@
   white-space: nowrap;
   border: 0;
 }
-
-/* Responsive para móviles */
 @media (max-width: 768px) {
-  .pdf-container {
-    max-height: 400px;
-  }
-  
+  .pdf-container { max-height: 400px; }
   .post-detail {
     flex-direction: column;
     align-items: flex-start;
@@ -276,43 +262,62 @@ export default {
   },
   
   computed: {
-
     ...mapState(["gacetas", "url_api"]),
 
-    documentosUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo').trim();
+    imageUrl() {
+      const envUrl = process.env.VUE_APP_UPLOADS_URL;
+
+      if (envUrl && typeof envUrl === 'string') {
+        const clean = envUrl.trim();
+        if (clean.endsWith('/uploads')) {
+          return clean;
+        }
+        return clean;
+      }
+
+      return 'https://apiadministrador.upea.bo';
     },
-
+    
     gacetaData() {
-      const gacetaId = parseInt(this.$route.params.idGac);
-      
-      if (!gacetaId || !this.gacetas?.length) {
+      try {
+        const gacetaId = parseInt(this.$route.params.idGac);
+        if (!gacetaId || !this.gacetas?.length) return null;
+        const gaceta = this.gacetas.find(g => g?.gaceta_id === gacetaId);
+        if (!gaceta || !gaceta.gaceta_id || !gaceta.gaceta_documento) return null;
+        return gaceta;
+      } catch (error) {
+        console.warn('Error obteniendo gacetaData:', error);
         return null;
       }
-
-      const gaceta = this.gacetas.find(g => g.gaceta_id === gacetaId);
-      
-      if (!gaceta || !gaceta.gaceta_id || !gaceta.gaceta_documento) {
-        return null;
-      }
-      
-      return gaceta;
     },
 
     gacetaNotFound() {
       return this.gacetas?.length > 0 && !this.gacetaData;
     },
+    
+    pdfUrlValid() {
+      if (!this.gacetaData?.gaceta_documento) return false;
+      const url = this.documentoUrl(this.gacetaData.gaceta_documento);
+      return url.startsWith('http://') || url.startsWith('https://');
+    },
   },
   
   methods: {
-
     documentoUrl(nombreArchivo) {
-      if (!nombreArchivo) return '';
-      // documentosUrl ya es: https://apiadministrador.upea.bo/uploads
-      // Resultado: https://apiadministrador.upea.bo/uploads/Gaceta/archivo.pdf
-      return `${this.documentosUrl}/uploads/Gaceta/${nombreArchivo}`;
-    },
+      if (!nombreArchivo) return '#';
 
+      if (nombreArchivo.startsWith('http://') || nombreArchivo.startsWith('https://')) {
+        return nombreArchivo;
+      }
+
+      if (nombreArchivo.startsWith('/')) {
+        const domain = this.imageUrl.replace(/\s+$/g, '');
+        return `${domain}${nombreArchivo}`;
+      }
+      const domain = this.imageUrl.replace(/\s+$/g, '');
+      return `${domain}${nombreArchivo}`;
+    },
+    
     formatearFecha(fechaISO) {
       if (!fechaISO) return 'Fecha no disponible';
       const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
@@ -322,11 +327,12 @@ export default {
     },
     
     onPdfLoaded() {
-      // console.log('PDF cargado correctamente');
+      console.log('✅ PDF cargado correctamente');
     },
 
     onPdfError(error) {
-      console.warn('Error cargando PDF de gaceta:', error);
+      console.warn('⚠️ Error cargando PDF:', error);
+
     },
 
     clickBack() {
@@ -335,9 +341,21 @@ export default {
     },
   },
   
-  created() {
-
-    this.$store.commit("loading");
-  },
+  // created() {
+  //   // Debug en desarrollo
+  //   if (process.env.NODE_ENV === 'development' && this.gacetaData) {
+  //     console.log('📄 DetalleGaceta - Debug:');
+  //     console.log('  gaceta_documento (raw):', this.gacetaData.gaceta_documento);
+  //     console.log('  imageUrl:', this.imageUrl);
+  //     console.log('  pdfUrl generada:', this.documentoUrl(this.gacetaData.gaceta_documento));
+      
+  //     // Testear si la URL es accesible
+  //     fetch(this.documentoUrl(this.gacetaData.gaceta_documento), { method: 'HEAD' })
+  //       .then(res => console.log('  📡 Status:', res.status, res.ok ? '✅' : '❌'))
+  //       .catch(err => console.log('  📡 Error de red:', err.message));
+  //   }
+    
+  //   this.$store.commit("loading");
+  // },
 };
 </script>

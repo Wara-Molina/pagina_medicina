@@ -45,7 +45,7 @@
               </li>
             </ul>
             
-            <a href="https://apiadministrador.upea.bo/sign-in" 
+            <a href="https://servicioadministrador.upea.bo/sign-in" 
                target="_blank" 
                rel="noopener noreferrer"
                class="login">
