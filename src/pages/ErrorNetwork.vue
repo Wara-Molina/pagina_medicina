@@ -3,8 +3,7 @@
     <div class="container_404">
       <h1>ERROR DE RED</h1>
       <h5>
-        Estamos teniendo problemas con los servidores, por favor intentelo mas
-        tarde.
+        Estamos teniendo problemas con los servidores; por favor, inténtelo más tarde.
       </h5>
       <br />
       <button class="boton" @click="reload()">

@@ -21,16 +21,11 @@
     <div class="row">
       <!-- Start Left Column -->
       <div class="col-sm-8 blog-left">
-        <!-- 👇 Adapter + validación segura -->
         <p class="content left-aligned" v-html="institucionData?.institucion_sobre_ins || 'Cargando...'"></p>
       </div>
-      <!-- End Left Column -->
-
-      <!-- Start Right Column -->
       <div class="col-sm-4">
         <SidebarCustom />
       </div>
-      <!-- End Right Column -->
     </div>
   </div>
 

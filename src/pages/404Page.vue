@@ -3,8 +3,7 @@
     <div class="container_404">
       <h1>404</h1>
       <h5>
-        La ruta asignada no existe. Si se trata de un error, contactase con el
-        desarrollador.
+        La ruta asignada no existe. Si se trata de un error, contáctese con el desarrollador.
       </h5>
       <br />
       <button class="boton" @click="$router.go(-1)">

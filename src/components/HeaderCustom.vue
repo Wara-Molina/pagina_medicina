@@ -4,7 +4,7 @@
   <header id="header" class="sticky-header">
     <nav class="navbar navbar-inverse" :style="navbarStyles">
       <div class="container">
-        <!-- Botón hamburguesa -->
+
         <div class="navbar-header">
           <button 
             type="button" 
@@ -27,7 +27,6 @@
           :style="{ background: colors.mobileBg }"
         >
           <ul class="nav navbar-nav navbar-center">
-            <!-- INICIO -->
             <li class="dropdown">
               <router-link data-toggle="dropdown" to="/" :style="{ color: colors.text }"
                 >INICIO <i class="fa fa-angle-down" aria-hidden="true"></i
@@ -41,12 +40,10 @@
               </ul>
             </li>
 
-            <!-- HISTORIA -->
             <li v-if="institucionData?.institucion_historia">
               <router-link to="/historia" :style="{ color: colors.text }">HISTORIA</router-link>
             </li>
 
-            <!-- CONVOCATORIAS -->
             <li class="dropdown">
               <a data-toggle="dropdown" href="#" :style="{ color: colors.text }"
                 >CONVOCATORIAS
@@ -65,7 +62,6 @@
               </ul>
             </li>
 
-            <!-- CURSOS -->
             <li class="dropdown">
               <a data-toggle="dropdown" href="#" :style="{ color: colors.text }"
                 >CURSOS <i class="fa fa-angle-down" aria-hidden="true"></i
@@ -83,7 +79,6 @@
               </ul>
             </li>
 
-            <!-- MÁS -->
             <li class="dropdown">
               <a data-toggle="dropdown" href="#" :style="{ color: colors.text }"
                 >MÁS <i class="fa fa-angle-down" aria-hidden="true"></i
@@ -122,7 +117,6 @@
               </ul>
             </li>
 
-            <!-- ENLACES -->
             <li class="dropdown">
               <a data-toggle="dropdown" href="#" :style="{ color: colors.text }"
                 >ENLACES <i class="fa fa-angle-down" aria-hidden="true"></i
@@ -148,11 +142,7 @@
 </template>
 
 <style scoped>
-/* =============================================
-   VARIABLES CSS DINÁMICAS (se aplican via :style)
-   ============================================= */
 
-/* Navbar general */
 #header {
   z-index: 1000;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -173,14 +163,10 @@
   transition: background 0.3s ease;
 }
 
-/* Contenedor del navbar */
 .navbar .container {
   position: relative;
 }
 
-/* =============================================
-   BOTÓN HAMBURGUESA ANIMADO
-   ============================================= */
 .navbar-toggle {
   display: none;
   float: right;
@@ -214,7 +200,6 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-/* Animación del hamburger a X */
 .navbar-toggle.collapsed .icon-bar:nth-child(1) { transform: rotate(0) translateY(0); }
 .navbar-toggle.collapsed .icon-bar:nth-child(2) { opacity: 1; transform: scaleX(1); }
 .navbar-toggle.collapsed .icon-bar:nth-child(3) { transform: rotate(0) translateY(0); }
@@ -223,9 +208,7 @@
 .navbar-toggle:not(.collapsed) .icon-bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
 .navbar-toggle:not(.collapsed) .icon-bar:nth-child(3) { transform: rotate(-45deg) translateY(-7px); }
 
-/* =============================================
-   MENÚ DE NAVEGACIÓN - DESKTOP
-   ============================================= */
+
 .navbar-nav {
   margin: 0;
   display: flex;
@@ -240,7 +223,6 @@
   position: relative;
 }
 
-/* Items del menú */
 .navbar-nav > li > a,
 .navbar-nav > li > router-link {
   padding: 20px 25px;
@@ -258,7 +240,6 @@
   border-right: none;
 }
 
-/* Efecto hover desktop */
 .navbar-nav > li > a:hover,
 .navbar-nav > li > router-link:hover {
   background: rgba(255, 255, 255, 0.1);
@@ -284,7 +265,6 @@
   width: 60%;
 }
 
-/* Dropdown menus desktop */
 .dropdown-menu {
   border: none;
   border-radius: 8px;
@@ -321,17 +301,12 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* =============================================
-   MENÚ MOBILE - ESTÉTICO CON COLORES DINÁMICOS
-   ============================================= */
 @media (max-width: 991px) {
-  /* Mostrar botón hamburguesa */
   .navbar-toggle {
     display: block;
     z-index: 1001;
   }
-  
-  /* Contenedor del menú colapsable */
+
   .navbar-collapse {
     padding: 0;
     border: none;
@@ -353,8 +328,7 @@
     from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  
-  /* Menú de navegación mobile */
+
   .navbar-nav {
     display: block;
     width: 100%;
@@ -406,8 +380,7 @@
     opacity: 1;
     transform: translateX(5px);
   }
-  
-  /* Dropdown en mobile */
+
   .dropdown-menu {
     position: static;
     float: none;
@@ -440,7 +413,6 @@
     padding-left: 50px;
   }
   
-  /* Scrollbar personalizado para mobile */
   .navbar-collapse::-webkit-scrollbar { width: 6px; }
   .navbar-collapse::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); }
   .navbar-collapse::-webkit-scrollbar-thumb { 
@@ -452,7 +424,6 @@
   }
 }
 
-/* Desktop - ajustes adicionales */
 @media (min-width: 992px) {
   .navbar-collapse {
     display: flex !important;
@@ -493,25 +464,23 @@ export default {
     institucionData() {
       return this.Institucion?.Descripcion || this.Institucion;
     },
-    
-    // ✅ Obtener colores desde la API (id_color: 9 para Medicina)
+
     colors() {
       const colors = this.Institucion?.colorinstitucion?.find(c => c.id_color === 9);
       
       if (colors) {
         return {
-          primary: colors.color_primario || '#C00014',      // Rojo principal
-          secondary: colors.color_secundario || '#FEFEFE',   // Blanco
-          tertiary: colors.color_terciario || '#F1EDEF',     // Gris claro
-          text: '#FFFFFF',                                    // Texto blanco
-          border: 'rgba(255, 255, 255, 0.3)',                // Borde semi-transparente
-          mobileBg: 'linear-gradient(180deg, #C00014 0%, #8b000c 100%)', // Gradiente mobile
-          dropdownBg: '#C00014',                              // Fondo dropdown
-          hoverBg: 'rgba(255, 255, 255, 0.1)'                 // Hover semi-transparente
+          primary: colors.color_primario || '#C00014',     
+          secondary: colors.color_secundario || '#FEFEFE',  
+          tertiary: colors.color_terciario || '#F1EDEF',   
+          text: '#FFFFFF',                      
+          border: 'rgba(255, 255, 255, 0.3)',    
+          mobileBg: 'linear-gradient(180deg, #C00014 0%, #8b000c 100%)',
+          dropdownBg: '#C00014',                        
+          hoverBg: 'rgba(255, 255, 255, 0.1)'
         };
       }
-      
-      // Fallback por defecto
+
       return {
         primary: '#C00014',
         secondary: '#FEFEFE',
@@ -523,24 +492,21 @@ export default {
         hoverBg: 'rgba(255, 255, 255, 0.1)'
       };
     },
-    
-    // ✅ Estilos dinámicos para el navbar
+
     navbarStyles() {
       return {
         background: `linear-gradient(135deg, ${this.colors.primary} 0%, ${this.adjustColor(this.colors.primary, -20)} 100%)`,
         boxShadow: `0 2px 10px ${this.colors.primary}40`
       };
     },
-    
-    // ✅ Estilos dinámicos para dropdowns
+
     dropdownStyles() {
       return {
         background: `linear-gradient(135deg, ${this.colors.dropdownBg} 0%, ${this.adjustColor(this.colors.dropdownBg, -20)} 100%)`,
         border: `2px solid ${this.colors.primary}`
       };
     },
-    
-    // Adapter para Links
+
     linksData() {
       return this.Links?.map(link => ({
         id_link: link.id_link || link.id || link.ei_id,
@@ -553,7 +519,7 @@ export default {
   },
   
   methods: {
-    // ✅ Función para ajustar el brillo de un color hex
+
     adjustColor(color, amount) {
       return '#' + color.replace(/^#/, '').replace(/../g, color => 
         ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2)
